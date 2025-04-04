@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 interface Prerequisites {
   toEnroll: number[];
@@ -27,8 +27,7 @@ interface YearlyPlan {
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent {
-  title = 'study-plan';
+export class AppComponent implements OnInit {
   studyPlan: YearlyPlan[] = [
     {
       year: 1,
@@ -170,20 +169,62 @@ export class AppComponent {
     }
   ];
 
-  highlightedSubjects: number[] = [];
   hoveredSubject: number | null = null;
+  highlightedToEnroll: number[] = [];
+  highlightedToTakeExam: number[] = [];
+  highlightedCompleted: number[] = [];
+  selectedSubjects: number[] = [];
 
-  highlightCorrelatives(subject: any) {
-    this.hoveredSubject = subject.code;
-    this.highlightedSubjects = [
-      ...subject.prerequisites.toEnroll,
-      ...subject.prerequisites.toTakeExam,
-      ...subject.prerequisites.completed
-    ];
+  constructor() {}
+
+  ngOnInit() {
+    // Cargar materias seleccionadas desde localStorage al iniciar
+    const storedSubjects = localStorage.getItem('selectedSubjects');
+    if (storedSubjects) {
+      this.selectedSubjects = JSON.parse(storedSubjects);
+    }
+  }
+
+  highlightSubject(subjectCode: number) {
+    this.hoveredSubject = subjectCode;
+  }
+
+  highlightToEnroll(codes: number[], subjectCode: number) {
+    this.highlightSubject(subjectCode);
+    this.highlightedToEnroll = [...codes];
+  }
+
+  highlightToTakeExam(codes: number[], subjectCode: number) {
+    this.highlightSubject(subjectCode);
+    this.highlightedToTakeExam = [...codes];
+  }
+
+  highlightCompleted(codes: number[], subjectCode: number) {
+    this.highlightSubject(subjectCode);
+    this.highlightedCompleted = [...codes];
   }
 
   resetHighlight() {
     this.hoveredSubject = null;
-    this.highlightedSubjects = [];
+    this.highlightedToEnroll = [];
+    this.highlightedToTakeExam = [];
+    this.highlightedCompleted = [];
+  }
+
+  toggleSelection(subjectCode: number) {
+    const index = this.selectedSubjects.indexOf(subjectCode);
+    if (index === -1) {
+      // Si no está en la lista, agregarlo y marcarlo como seleccionado
+      this.selectedSubjects.push(subjectCode);
+    } else {
+      // Si ya está en la lista, quitarlo
+      this.selectedSubjects.splice(index, 1);
+    }
+    // Guardar en localStorage
+    localStorage.setItem('selectedSubjects', JSON.stringify(this.selectedSubjects));
+  }
+
+  isSelected(subjectCode: number): boolean {
+    return this.selectedSubjects.includes(subjectCode);
   }
 }

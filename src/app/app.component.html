@@ -1,51 +1,62 @@
 <div class="p-8">
-<div class="max-w-4xl mx-auto bg-background-500 p-6 rounded-lg shadow-xl">
-    <h1 class="text-xl md:text-2xl font-800 mb-4">Tec. Universitaria en Programación Web</h1>
-  @for (yearPlan of studyPlan; track $index) {
- <h2 class="text-lg md:text-xl font-bold text-blue-700 my-4 text-center md:text-left">
-    Año {{ yearPlan.year }} - Total de horas: {{ yearPlan.totalHours }}hs
-  </h2>
+    <div class="max-w-4xl mx-auto bg-background-500 p-6 rounded-lg shadow-xl">
+        <h1 class="text-xl md:text-2xl font-bold mb-4">Tec. Universitaria en Programación Web</h1>
 
-  <div class="overflow-x-auto">
-    <table class="table-auto w-full border border-collapse border-gray-400 text-xs md:text-sm">
-      <thead class="bg-blue-100">
-        <tr>
-          <th class="border p-2">Código</th>
-          <th class="border p-2">Asignatura</th>
-          <th class="border p-2">Cuatrimestre</th>
-          <th class="border p-2">Para Cursar</th>
-          <th class="border p-2">Para Rendir</th>
-          <th class="border p-2">Rendidas</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (subject of yearPlan.subjects; track $index) {
-          <tr
-            (mouseenter)="highlightCorrelatives(subject)"
-            (mouseleave)="resetHighlight()"
-            [ngClass]="{
-              'bg-blue-200': hoveredSubject === subject.code,
-              'bg-yellow-200': highlightedSubjects.includes(subject.code) && hoveredSubject !== subject.code
-            }"
-          >
-            <td class="border p-2 text-center">{{ subject.code }}</td>
-            <td class="border p-2">{{ subject.subject }}</td>
-            <td class="border p-2 text-center">{{ subject.semester }}</td>
-            <td class="border p-2 text-center">
-              {{ subject.prerequisites.toEnroll.length ? subject.prerequisites.toEnroll.join(', ') : '-' }}
-            </td>
-            <td class="border p-2 text-center">
-              {{ subject.prerequisites.toTakeExam.length ? subject.prerequisites.toTakeExam.join(', ') : '-' }}
-            </td>
-            <td class="border p-2 text-center">
-              {{ subject.prerequisites.completed.length ? subject.prerequisites.completed.join(', ') : '-' }}
-            </td>
-          </tr>
+        @for (yearPlan of studyPlan; track $index) {
+        <h2 class="text-lg md:text-xl font-bold text-blue-700 my-4 text-center md:text-left">
+            Año {{ yearPlan.year }} - Total de horas: {{ yearPlan.totalHours }}hs
+        </h2>
+
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full border border-collapse border-gray-400 text-xs md:text-sm">
+                <thead class="bg-blue-100">
+                    <tr>
+                        <th class="border p-2">Código</th>
+                        <th class="border p-2">Asignatura</th>
+                        <th class="border p-2">Cuatrimestre</th>
+                        <th class="border p-2">Cursada</th>
+                        <th class="border p-2">Rendida</th>
+                        <th class="border p-2">Rendidas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (subject of yearPlan.subjects; track $index) {
+                    <tr
+                        (mouseenter)="highlightSubject(subject.code)"
+                        (mouseleave)="resetHighlight()"
+                        (click)="toggleSelection(subject.code)"
+                        [ngClass]="{
+                            'bg-green-300': selectedSubjects.includes(subject.code),
+                            'bg-yellow-200': highlightedToEnroll.includes(subject.code),
+                            'bg-blue-200': highlightedToTakeExam.includes(subject.code),
+                            'bg-red-200': highlightedCompleted.includes(subject.code),
+                            'bg-gray-300': hoveredSubject === subject.code && !selectedSubjects.includes(subject.code)
+                        }"
+                        class="cursor-pointer"
+                    >
+                        <td class="border p-2 text-center">{{ subject.code }}</td>
+                        <td class="border p-2">{{ subject.subject }}</td>
+                        <td class="border p-2 text-center">{{ subject.semester }}</td>
+                        <td class="border p-2 text-center"
+                            (mouseenter)="highlightToEnroll(subject.prerequisites.toEnroll, subject.code)"
+                            (mouseleave)="resetHighlight()">
+                            {{ subject.prerequisites.toEnroll.length ? subject.prerequisites.toEnroll.join(', ') : '-' }}
+                        </td>
+                        <td class="border p-2 text-center"
+                            (mouseenter)="highlightToTakeExam(subject.prerequisites.toTakeExam, subject.code)"
+                            (mouseleave)="resetHighlight()">
+                            {{ subject.prerequisites.toTakeExam.length ? subject.prerequisites.toTakeExam.join(', ') : '-' }}
+                        </td>
+                        <td class="border p-2 text-center"
+                            (mouseenter)="highlightCompleted(subject.prerequisites.completed, subject.code)"
+                            (mouseleave)="resetHighlight()">
+                            {{ subject.prerequisites.completed.length ? subject.prerequisites.completed.join(', ') : '-' }}
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
         }
-      </tbody>
-    </table>
-  </div>
-  }
-</div>
-
+    </div>
 </div>
